@@ -1,3 +1,156 @@
+# v00-10-05
+
+* 2024-02-07 Thomas Madlener ([PR#266](https://github.com/key4hep/EDM4hep/pull/266))
+  - Revert making MCParticle momenta double precision, since this breaks without schema evolution. (Reverts key4hep/EDM4hep#237)
+    - All particle momenta are effectively zeroed out at the moment.
+
+* 2024-02-07 jmcarcell ([PR#264](https://github.com/key4hep/EDM4hep/pull/264))
+  - Delete build workflow since we have another one for key4hep that covers builds for nightlies, releases and all the operating systems we support
+
+* 2024-02-06 jmcarcell ([PR#263](https://github.com/key4hep/EDM4hep/pull/263))
+  - Change ROOTFrame{Writer,Reader} to ROOT{Writer,Reader} following https://github.com/AIDASoft/podio/pull/549
+
+# v00-10-04
+
+* 2024-01-30 tmadlener ([PR#258](https://github.com/key4hep/EDM4hep/pull/258))
+  - Bump the version in the schema diagram to v0.10
+
+* 2024-01-23 tmadlener ([PR#237](https://github.com/key4hep/EDM4hep/pull/237))
+  - Switch the `momentum` and `momentumAtEndpoint` of the `MCParticle` from `Vector3f` to `Vector3d`. 
+  - Add a (deprecated from the beginning) constructor from `Vector3f` to `Vector3d` to ease the transition.
+
+* 2024-01-22 tmadlener ([PR#253](https://github.com/key4hep/EDM4hep/pull/253))
+  - Fix she-bang in README links update script.
+
+* 2024-01-12 Mateusz Jakub Fila ([PR#250](https://github.com/key4hep/EDM4hep/pull/250))
+  - Fixed doxygen excluded files and path stripping
+
+* 2024-01-08 Mateusz Jakub Fila ([PR#249](https://github.com/key4hep/EDM4hep/pull/249))
+  - Fixed formatting of components table in readme
+
+# v00-10-03
+
+* 2024-01-08 Joe Osborn ([PR#248](https://github.com/key4hep/EDM4hep/pull/248))
+  - Added a Vector4f object for use as a general 4 dimensional vector with members `x`, `y`, `z` and `t`. Fixes https://github.com/key4hep/EDM4hep/issues/245
+
+* 2023-12-12 Mateusz Jakub Fila ([PR#244](https://github.com/key4hep/EDM4hep/pull/244))
+  - Fixed typos and links in documentation and doxygen
+
+* 2023-12-06 tmadlener ([PR#243](https://github.com/key4hep/EDM4hep/pull/243))
+  - Make sure that tests also work in Ubuntu 20.04 environments by running catch test discovery in correct environment.
+
+* 2023-12-05 jmcarcell ([PR#235](https://github.com/key4hep/EDM4hep/pull/235))
+  - Use `FILE_SET` to install the headers in the top folder together with the library. This also adds them in the `BUILD_INTERFACE`, something that a simple `INSTALL` doesn't do.
+  - Bump the CMake version of the LCG stacks
+  - Simplify finding ROOT, don't do environment variable manipulation in CMake
+
+# v00-10-02
+
+* 2023-11-14 jmcarcell ([PR#240](https://github.com/key4hep/EDM4hep/pull/240))
+  - Change EventHeader to EventHeaderName; we already have an EventHeaderCollection and its elements are called EventHeader (`edm4hep::EventHeader` more precisely)
+
+* 2023-11-14 Leonhard Reichenbach ([PR#239](https://github.com/key4hep/EDM4hep/pull/239))
+  - Add a constant for the default expected EventHeader name to be used by the converters and PodioInput
+
+# v00-10-01
+
+* 2023-11-01 jmcarcell ([PR#234](https://github.com/key4hep/EDM4hep/pull/234))
+  - Add a constant for CellIDEncoding. Usage:
+  
+  ``` cpp
+  #include "edm4hep/Constants.h"
+  
+  std::cout << edm4hep::CellIDEncoding << std::endl;
+  ```
+
+* 2023-11-01 Juraj Smiesko ([PR#227](https://github.com/key4hep/EDM4hep/pull/227))
+  - edm4hep2json now converts all EDM4hep collections, associations and Podio user data
+  - added ROOT legacy support for edm4hep2json
+
+* 2023-09-13 jmcarcell ([PR#226](https://github.com/key4hep/EDM4hep/pull/226))
+  - Rename the cmake executable or target `unittests` to `unittests_edm4hep`, to avoid possible collisions since the `unittests` name is relatively common
+
+* 2023-09-11 Wouter Deconinck ([PR#225](https://github.com/key4hep/EDM4hep/pull/225))
+  - Define schema_version at top level in yaml file
+
+* 2023-09-11 tmadlener ([PR#224](https://github.com/key4hep/EDM4hep/pull/224))
+  - Add `SKIP_CATCH_DISCOVERY` option to turn of `catch_discover_tests` which may not run in the right environment in older cmake versions.
+
+* 2023-09-05 Andre Sailer ([PR#223](https://github.com/key4hep/EDM4hep/pull/223))
+  - CI: use same lcg stacks as podio
+  - Test: update to Catch2 3.4.0, same as in podio, and c++20 compatible
+
+* 2023-09-05 jmcarcell ([PR#222](https://github.com/key4hep/EDM4hep/pull/222))
+  - Remove init.sh
+
+# v00-10
+
+* 2023-07-07 BrieucF ([PR#212](https://github.com/key4hep/EDM4hep/pull/212))
+  - Add a script to automatically update the README.md links
+
+* 2023-07-04 tmadlener ([PR#209](https://github.com/key4hep/EDM4hep/pull/209))
+  - Add brief documentation of the `edm4hep2json` tool with minimal documentation of the output JSON schema.
+
+* 2023-06-30 jmcarcell ([PR#207](https://github.com/key4hep/EDM4hep/pull/207))
+  - Improve python API, use `import edm4hep` instead of `from edm4hep import edm4hep`
+
+* 2023-06-29 tmadlener ([PR#206](https://github.com/key4hep/EDM4hep/pull/206))
+  - Replace TPCHit with RawTimeSeries
+  - Update version to 0.9
+  - Add TrackerPulse
+
+* 2023-06-14 jmcarcell ([PR#204](https://github.com/key4hep/EDM4hep/pull/204))
+  - Add python bindings for the datamodel classes and some documentation on how to use the bindings
+
+* 2023-06-07 FinnJohannsen ([PR#188](https://github.com/key4hep/EDM4hep/pull/188))
+  - Changed the name of one VectorMember of edm4hep::track from subDetectorHitNumbers to subdetectorHitNumbers to be consistent with other spellings of the word subdetector in the yaml file and in LCIO.
+
+# v00-09
+
+* 2023-05-03 Thomas Madlener ([PR#152](https://github.com/key4hep/EDM4hep/pull/152))
+  - Add a `EDM4hepVersion.h` file that has the same basic structure and functionality as other Key4hep packages.
+
+* 2023-05-02 jmcarcell ([PR#193](https://github.com/key4hep/EDM4hep/pull/193))
+  - Add a configuration file for the new podio visualization tool
+
+* 2023-04-28 jmcarcell ([PR#203](https://github.com/key4hep/EDM4hep/pull/203))
+  - Remove root version check inside CMakeLists.txt
+
+* 2023-04-26 jmcarcell ([PR#205](https://github.com/key4hep/EDM4hep/pull/205))
+  - Add missing units to the comments
+
+* 2023-04-23 Thomas Madlener ([PR#200](https://github.com/key4hep/EDM4hep/pull/200))
+  - Add `schema_version` to YAML definition now that podio has limited support (see AIDASoft/podio#341)
+
+# v00-08
+
+* 2023-04-03 Paul Gessinger ([PR#201](https://github.com/key4hep/EDM4hep/pull/201))
+  - Added string stream include in `edm4hep2json.hxx`
+
+* 2023-03-02 wenxingfang ([PR#179](https://github.com/key4hep/EDM4hep/pull/179))
+  - Extend for drift chamber and TPC study
+  - The extended EDMs are tested within CEPCSW, and it works well
+  - The extended edm4hep::TrackerPulse and edm4hep::TrackerData are similar to what they are in ILC TPC
+
+* 2023-02-27 Juraj Smiesko ([PR#182](https://github.com/key4hep/EDM4hep/pull/182))
+  - JSON Exporter: Adding the possibility to provide list of events
+  - Update JSON Exporter to use Frame based I/O
+
+* 2023-02-22 Thomas Madlener ([PR#194](https://github.com/key4hep/EDM4hep/pull/194))
+  - Make the HepMC example use Frame based I/O
+
+* 2023-02-21 Thomas Madlener ([PR#184](https://github.com/key4hep/EDM4hep/pull/184))
+  - Make the I/O tests use `podio::Frame` functionality
+
+* 2023-02-01 Dmitry Kalinkin ([PR#190](https://github.com/key4hep/EDM4hep/pull/190))
+  - Document some units for edm4hep::Vector3f fields
+
+* 2023-01-23 Thomas Madlener ([PR#189](https://github.com/key4hep/EDM4hep/pull/189))
+  - Make the minimum nlohmann json version 3.10.5, as other patch releases of the 3.10 series, seem to not compile. Fixes #181
+
+* 2023-01-06 lintao ([PR#187](https://github.com/key4hep/EDM4hep/pull/187))
+  - Fix a typo in setDecayedInCalorimeter.
+
 # v00-07-02
 
 * 2022-11-29 Thomas Madlener ([PR#186](https://github.com/key4hep/EDM4hep/pull/186))

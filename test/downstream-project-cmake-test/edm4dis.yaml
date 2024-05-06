@@ -1,4 +1,6 @@
 ---
+schema_version: 2
+
 options :
   # should getters / setters be prefixed with get / set?
   getSyntax: True

@@ -1,22 +1,15 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.23)
 
 project(EDM4HEP LANGUAGES CXX)
 
 # project version
 SET( ${PROJECT_NAME}_VERSION_MAJOR 0 )
-SET( ${PROJECT_NAME}_VERSION_MINOR 7 )
-SET( ${PROJECT_NAME}_VERSION_PATCH 2 )
+SET( ${PROJECT_NAME}_VERSION_MINOR 10 )
+SET( ${PROJECT_NAME}_VERSION_PATCH 99 )
 
 SET( ${PROJECT_NAME}_VERSION  "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH}" )
 
-
-#--- Run the podio class generator and link library -------
-
 find_package(podio REQUIRED HINTS $ENV{PODIO})
-
-#--- Declare ROOT dependency ---------------------------------------------------
-list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 find_package(ROOT REQUIRED COMPONENTS RIO Tree Physics)
 
 #--- Define basic build settings -----------------------------------------------
@@ -80,19 +73,18 @@ endif()
 #--- target for Doxygen documentation ------------------------------------------
 if(BUILD_DOCS)
   include(cmake/EDM4HEPDoxygen.cmake)
-  # copy images needed for documentation to build folder and install them
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/edm4hep_diagram.svg
-                 ${CMAKE_CURRENT_BINARY_DIR}/doxygen/html/doc/edm4hep_diagram.svg COPYONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/doxygen/html/doc/edm4hep_diagram.svg
-          DESTINATION ${CMAKE_INSTALL_DOCDIR})
 endif()
 
 #--- add version files ---------------------------------------------------------
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/EDM4HEPVersion.h
-               ${CMAKE_CURRENT_BINARY_DIR}/EDM4HEPVersion.h )
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/EDM4HEPVersion.h
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/EDM4hepVersion.h.in
+               ${CMAKE_CURRENT_SOURCE_DIR}/edm4hep/edm4hep/EDM4hepVersion.h )
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/edm4hep/edm4hep/EDM4hepVersion.h
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/edm4hep )
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/python/edm4hep/__version__.py.in
+  ${CMAKE_CURRENT_SOURCE_DIR}/python/edm4hep/__version__.py)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/edm4hep
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 #--- add CMake infrastructure --------------------------------------------------
 include(cmake/EDM4HEPCreateConfig.cmake)
@@ -102,12 +94,13 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE
               ${CMAKE_CURRENT_SOURCE_DIR}/NOTICE
               DESTINATION ${CMAKE_INSTALL_DOCDIR})
 
-find_package(nlohmann_json 3.10)
+find_package(nlohmann_json 3.10.5)
 
 add_subdirectory(edm4hep)
 add_subdirectory(utils)
 add_subdirectory(test)
 add_subdirectory(tools)
+add_subdirectory(python)
 
 #--- create uninstall target ---------------------------------------------------
 include(cmake/EDM4HEPUninstall.cmake)

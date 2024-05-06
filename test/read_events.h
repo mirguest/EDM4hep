@@ -4,13 +4,13 @@
 // test data model
 #include "edm4hep/CaloHitContributionCollection.h"
 #include "edm4hep/MCParticleCollection.h"
+#include "edm4hep/RawTimeSeriesCollection.h"
 #include "edm4hep/SimCalorimeterHitCollection.h"
 #include "edm4hep/SimTrackerHitCollection.h"
-#include "edm4hep/TPCHitCollection.h"
 #include "edm4hep/TrackerHitPlaneCollection.h"
 
 // podio specific includes
-#include "podio/EventStore.h"
+#include "podio/Frame.h"
 
 // STL
 #include <cassert>
@@ -18,13 +18,13 @@
 #include <iostream>
 #include <vector>
 
-void processEvent(podio::EventStore& store, bool verboser, unsigned eventNum) {
-  auto& mcps = store.get<edm4hep::MCParticleCollection>("MCParticles");
-  auto& sths = store.get<edm4hep::SimTrackerHitCollection>("SimTrackerHits");
-  auto& schs = store.get<edm4hep::SimCalorimeterHitCollection>("SimCalorimeterHits");
-  auto& sccons = store.get<edm4hep::CaloHitContributionCollection>("SimCalorimeterHitContributions");
-  auto& tpchs = store.get<edm4hep::TPCHitCollection>("TPCHits");
-  auto& thps = store.get<edm4hep::TrackerHitPlaneCollection>("TrackerHitPlanes");
+void processEvent(const podio::Frame& event) {
+  auto& mcps = event.get<edm4hep::MCParticleCollection>("MCParticles");
+  auto& sths = event.get<edm4hep::SimTrackerHitCollection>("SimTrackerHits");
+  auto& schs = event.get<edm4hep::SimCalorimeterHitCollection>("SimCalorimeterHits");
+  auto& sccons = event.get<edm4hep::CaloHitContributionCollection>("SimCalorimeterHitContributions");
+  auto& tpchs = event.get<edm4hep::RawTimeSeriesCollection>("TPCHits");
+  auto& thps = event.get<edm4hep::TrackerHitPlaneCollection>("TrackerHitPlanes");
 
   if (mcps.isValid()) {
 
@@ -58,11 +58,11 @@ void processEvent(podio::EventStore& store, bool verboser, unsigned eventNum) {
     auto d1 = mcp1.getDaughters(1);
     auto d2 = mcp1.getDaughters(2);
 
-    if (!(d0 == mcps[2]))
+    if (d0 != mcps[2])
       throw std::runtime_error(" error: 1. daughter of particle 0 is not particle 2 ");
-    if (!(d1 == mcps[4]))
+    if (d1 != mcps[4])
       throw std::runtime_error(" error: 2. daughter of particle 0 is not particle 4 ");
-    if (!(d2 == mcps[5]))
+    if (d2 != mcps[5])
       throw std::runtime_error(" error: 3. daughter of particle 0 is not particle 5 ");
 
     auto mcp2 = mcps[1];
@@ -90,9 +90,9 @@ void processEvent(podio::EventStore& store, bool verboser, unsigned eventNum) {
         throw std::runtime_error("cellID != 0xabadcaffee");
       if (sth1.getEDep() != j * 0.000001f)
         throw std::runtime_error("e_dep != j * 0.000001");
-      if (!(sth1.getPosition() == edm4hep::Vector3d(j * 10., j * 20., j * 5.)))
+      if (sth1.getPosition() != edm4hep::Vector3d(j * 10., j * 20., j * 5.))
         throw std::runtime_error("position != ( j*10. , j*20., j*5. )");
-      if (!(sth1.getMCParticle() == mcps[6]))
+      if (sth1.getParticle() != mcps[6])
         throw std::runtime_error("mcp != mcps[6]");
 
       auto sth2 = sths[2 * j + 1];
@@ -100,9 +100,9 @@ void processEvent(podio::EventStore& store, bool verboser, unsigned eventNum) {
         throw std::runtime_error("cellID != 0xcaffeebabe");
       if (sth2.getEDep() != j * 0.001f)
         throw std::runtime_error("e_dep != j * 0.001");
-      if (!(sth2.getPosition() == edm4hep::Vector3d(-j * 10., -j * 20., -j * 5.)))
+      if (sth2.getPosition() != edm4hep::Vector3d(-j * 10., -j * 20., -j * 5.))
         throw std::runtime_error("position != ( -j*10. , -j*20., -j*5. )");
-      if (!(sth2.getMCParticle() == mcps[7]))
+      if (sth2.getParticle() != mcps[7])
         throw std::runtime_error("mcp != mcps[7]");
     }
 
@@ -137,14 +137,14 @@ void processEvent(podio::EventStore& store, bool verboser, unsigned eventNum) {
         throw std::runtime_error("cellID != 0xabadcaffee");
       if (sch1.getEnergy() != j * 0.1f)
         throw std::runtime_error("energy != j*0.1f");
-      if (!(sch1.getPosition() == edm4hep::Vector3f(j * 100.f, j * 200.f, j * 50.f)))
+      if (sch1.getPosition() != edm4hep::Vector3f(j * 100.f, j * 200.f, j * 50.f))
         throw std::runtime_error("position != ( j*100. , j*200., j*50. )");
 
       auto cont1 = sch1.getContributions(0);
 
-      if (!(cont1.getPDG() == 11) || !(cont1.getEnergy() == j * 0.1f) || !(cont1.getTime() == j * 1e-9f) ||
+      if (cont1.getPDG() != 11 || cont1.getEnergy() != j * 0.1f || cont1.getTime() != j * 1e-9f ||
           !(cont1.getStepPosition() == edm4hep::Vector3f(j * 100.01f, j * 200.01f, j * 50.01f)) ||
-          !(cont1.getParticle() == mcps[6])) {
+          cont1.getParticle() != mcps[6]) {
         throw std::runtime_error("contribution1 does not match ");
       }
 
@@ -153,14 +153,14 @@ void processEvent(podio::EventStore& store, bool verboser, unsigned eventNum) {
         throw std::runtime_error("cellID != 0xcaffeebabe");
       if (sch2.getEnergy() != j * 0.2f)
         throw std::runtime_error("energy != j*0.2");
-      if (!(sch2.getPosition() == edm4hep::Vector3f(-j * 100.f, -j * 200.f, -j * 50.f)))
+      if (sch2.getPosition() != edm4hep::Vector3f(-j * 100.f, -j * 200.f, -j * 50.f))
         throw std::runtime_error("position != ( -j*100.f , -j*200.f, -j*50.f )");
 
       auto cont2 = sch2.getContributions(0);
 
-      if (!(cont2.getPDG() == -11) || !(cont2.getEnergy() == j * 0.2f) || !(cont2.getTime() == j * 1e-9f) ||
+      if (cont2.getPDG() != -11 || cont2.getEnergy() != j * 0.2f || cont2.getTime() != j * 1e-9f ||
           !(cont2.getStepPosition() == edm4hep::Vector3f(-j * 100.01f, -j * 200.01f, -j * 50.01f)) ||
-          !(cont2.getParticle() == mcps[7])) {
+          cont2.getParticle() != mcps[7]) {
         throw std::runtime_error("contribution2 does not match ");
       }
     }
@@ -240,8 +240,7 @@ void processEvent(podio::EventStore& store, bool verboser, unsigned eventNum) {
   //    throw std::runtime_error("Collection 'SimCalorimeterHitContributions' should be present");
   //  }
 
-  auto& evtMD = store.getEventMetaData();
-  const auto& evtType = evtMD.getValue<std::string>("EventType");
+  const auto& evtType = event.getParameter<std::string>("EventType");
   std::cout << "Event Type: " << evtType << std::endl;
 }
 
@@ -250,18 +249,12 @@ void read_events(const std::string& filename) {
   ReaderT reader;
   reader.openFile(filename);
 
-  auto store = podio::EventStore();
-  store.setReader(&reader);
-
-  unsigned nEvents = reader.getEntries();
+  unsigned nEvents = reader.getEntries("events");
   for (unsigned i = 0; i < nEvents; ++i) {
-    if (i % 1000 == 0)
-      std::cout << "reading event " << i << std::endl;
-    processEvent(store, true, i);
-    store.clear();
-    reader.endOfEvent();
+    std::cout << "reading event " << i << std::endl;
+    const auto event = podio::Frame(reader.readNextEntry("events"));
+    processEvent(event);
   }
-  reader.closeFile();
 }
 
 #endif

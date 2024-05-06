@@ -1,19 +1,9 @@
 #!/usr/bin/env python3
 
-import os
-import sys
 import unittest
-
-import ROOT
 import cppyy
 
-if ROOT.gSystem.Load('libedm4hepDict.so') < 0:
-  print('Cannot load edm4hep dictionary for tests')
-  sys.exit(1)
-
-ROOT.gInterpreter.LoadFile(os.path.dirname(__file__) + '/../../utils/include/edm4hep/utils/kinematics.h')
-
-from ROOT import edm4hep
+import edm4hep
 
 # A few shorthands for slightly easier to read tests below
 p4 = edm4hep.utils.p4
@@ -41,8 +31,8 @@ class TestKinematics(unittest.TestCase):
                            125.0,  # charge
                            edm4hep.Vector3d(0, 0, 0),  # vertex
                            edm4hep.Vector3d(0, 0, 0),  # endpoint
-                           edm4hep.Vector3f(1.0, 2.0, 3.0),  # momentum
-                           edm4hep.Vector3f(0, 0, 0),  # momentumAtEndpoint
+                           edm4hep.Vector3d(1.0, 2.0, 3.0),  # momentum
+                           edm4hep.Vector3d(0, 0, 0),  # momentumAtEndpoint
                            edm4hep.Vector3f(0, 0, 0),  # spin
                            edm4hep.Vector2i(0, 0)  # colorFlow
                            )
@@ -58,7 +48,7 @@ class TestKinematics(unittest.TestCase):
                                       1.0,  # charge
                                       125.0,  # mass
                                       0.0,  # goodnessOfPID
-                                      cppyy.gbl.std.array('float', 10)()  # covMatrix
+                                      edm4hep.CovMatrix4f() # covMatrix
                                       )
 
     self.assertEqual(p4(p), LVM(1.0, 2.0, 3.0, 125.0))
